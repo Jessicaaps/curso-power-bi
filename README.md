@@ -1,4 +1,4 @@
-# Desafios de Projetos — Curso de Power BI | DIO
+# Curso de Power BI | DIO - Desafios de Projetos
 
 Neste repositório estão os desafios e projetos realizados durante o curso de Power BI da DIO.
 
