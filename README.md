@@ -10,3 +10,6 @@ Replicar duas páginas já criadas e criar terceira página com alguns visuais.
 
 ## 03. Visualização de Dados e Relatórios com Power BI
 Criar um relatório com base na sample financials do Power BI.
+
+## 04. Processamento de Dados com Power BI
+Integrando Dados com MySQL Azure e Transformando com Power BI.
