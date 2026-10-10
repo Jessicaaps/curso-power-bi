@@ -1,8 +1,8 @@
 # Atividade Prática
 
-Atividade prática desenvolvida durante o curso de Power BI, utilizando o **Power BI Desktop**.
+Atividade prática desenvolvida durante o curso de Power BI, utilizando o Power BI Desktop.
 
-A publicação no **Power BI Service** não foi realizada, pois é necessária uma conta corporativa ou vinculada a uma instituição de ensino. No momento, possuo apenas uma conta pessoal, que não permite esse tipo de acesso.
+A publicação no Power BI Service não foi realizada, pois é necessária uma conta corporativa ou vinculada a uma instituição de ensino. No momento, possuo apenas uma conta pessoal, que não permite esse tipo de acesso.
 
 ### Arquivos
 
