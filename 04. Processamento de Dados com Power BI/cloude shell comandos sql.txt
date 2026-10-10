@@ -1,0 +1,676 @@
+jessica [ ~ ]$ mysql -h projeto-dio-26.mysql.database.azure.com -u jess26 -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MySQL connection id is 16
+Server version: 8.0.46-azure Source distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MySQL [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.008 sec)
+
+MySQL [(none)]> create schema if not exists azure_company;
+Query OK, 1 row affected (0.024 sec)
+
+MySQL [(none)]> use azure_company;
+Database changed
+MySQL [azure_company]> show tables;
+Empty set (0.008 sec)
+
+MySQL [azure_company]> CREATE TABLE employee(
+    -> Fname varchar(15) not null,
+    ->     Minit char,
+    ->     Lname varchar(15) not null,
+    ->     Ssn char(9) not null, 
+    ->     Bdate date,
+    ->     Address varchar(30),
+    ->     Sex char,
+    ->     Salary decimal(10,2),
+    ->     Super_ssn char(9),
+    ->     Dno int not null,
+    ->     constraint chk_salary_employee check (Salary> 2000.0),
+    ->     constraint pk_employee primary key (Ssn)
+    -> );
+Query OK, 0 rows affected (0.067 sec)
+
+MySQL [azure_company]> show tables;
++-------------------------+
+| Tables_in_azure_company |
++-------------------------+
+| employee                |
++-------------------------+
+1 row in set (0.010 sec)
+
+MySQL [azure_company]> desc employee;
++-----------+---------------+------+-----+---------+-------+
+| Field     | Type          | Null | Key | Default | Extra |
++-----------+---------------+------+-----+---------+-------+
+| Fname     | varchar(15)   | NO   |     | NULL    |       |
+| Minit     | char(1)       | YES  |     | NULL    |       |
+| Lname     | varchar(15)   | NO   |     | NULL    |       |
+| Ssn       | char(9)       | NO   | PRI | NULL    |       |
+| Bdate     | date          | YES  |     | NULL    |       |
+| Address   | varchar(30)   | YES  |     | NULL    |       |
+| Sex       | char(1)       | YES  |     | NULL    |       |
+| Salary    | decimal(10,2) | YES  |     | NULL    |       |
+| Super_ssn | char(9)       | YES  |     | NULL    |       |
+| Dno       | int           | NO   |     | NULL    |       |
++-----------+---------------+------+-----+---------+-------+
+10 rows in set (0.009 sec)
+
+MySQL [azure_company]> alter table employee 
+    -> add constraint fk_employee 
+    -> foreign key(Super_ssn) references employee(Ssn)
+    ->     on delete set null
+    ->     on update cascade;
+Query OK, 0 rows affected (0.202 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MySQL [azure_company]> alter table employee modify Dno int not null default 1;
+Query OK, 0 rows affected (0.026 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MySQL [azure_company]> desc employee;
++-----------+---------------+------+-----+---------+-------+
+| Field     | Type          | Null | Key | Default | Extra |
++-----------+---------------+------+-----+---------+-------+
+| Fname     | varchar(15)   | NO   |     | NULL    |       |
+| Minit     | char(1)       | YES  |     | NULL    |       |
+| Lname     | varchar(15)   | NO   |     | NULL    |       |
+| Ssn       | char(9)       | NO   | PRI | NULL    |       |
+| Bdate     | date          | YES  |     | NULL    |       |
+| Address   | varchar(30)   | YES  |     | NULL    |       |
+| Sex       | char(1)       | YES  |     | NULL    |       |
+| Salary    | decimal(10,2) | YES  |     | NULL    |       |
+| Super_ssn | char(9)       | YES  | MUL | NULL    |       |
+| Dno       | int           | NO   |     | 1       |       |
++-----------+---------------+------+-----+---------+-------+
+10 rows in set (0.009 sec)
+
+MySQL [azure_company]> create table departament(
+    -> Dname varchar(15) not null,
+    ->     Dnumber int not null,
+    ->     Mgr_ssn char(9) not null,
+    ->     Mgr_start_date date, 
+    ->     Dept_create_date date,
+    ->     constraint chk_date_dept check (Dept_create_date < Mgr_start_date),
+    ->     constraint pk_dept primary key (Dnumber),
+    ->     constraint unique_name_dept unique(Dname),
+    ->     foreign key (Mgr_ssn) references employee(Ssn)
+    -> );
+Query OK, 0 rows affected (0.079 sec)
+
+MySQL [azure_company]> -- 'def', 'company_constraints', 'departament_ibfk_1', 'company_constraints', 'departament', 'FOREIGN KEY', 'YES'
+MySQL [azure_company]> -- modificar uma constraint: drop e add
+MySQL [azure_company]> alter table departament drop  departament_ibfk_1;
+ERROR 1091 (42000): Can't DROP 'departament_ibfk_1'; check that column/key exists
+MySQL [azure_company]> alter table departament 
+    -> 
+Display all 744 possibilities? (y or n) 
+    -> 
+    -> desc departament;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'desc departament' at line 3
+MySQL [azure_company]> \c
+MySQL [azure_company]> desc departament;
++------------------+-------------+------+-----+---------+-------+
+| Field            | Type        | Null | Key | Default | Extra |
++------------------+-------------+------+-----+---------+-------+
+| Dname            | varchar(15) | NO   | UNI | NULL    |       |
+| Dnumber          | int         | NO   | PRI | NULL    |       |
+| Mgr_ssn          | char(9)     | NO   | MUL | NULL    |       |
+| Mgr_start_date   | date        | YES  |     | NULL    |       |
+| Dept_create_date | date        | YES  |     | NULL    |       |
++------------------+-------------+------+-----+---------+-------+
+5 rows in set (0.009 sec)
+
+MySQL [azure_company]> SHOW CREATE TABLE departament;
++-------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table       | Create Table                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
++-------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| departament | CREATE TABLE `departament` (
+  `Dname` varchar(15) NOT NULL,
+  `Dnumber` int NOT NULL,
+  `Mgr_ssn` char(9) NOT NULL,
+  `Mgr_start_date` date DEFAULT NULL,
+  `Dept_create_date` date DEFAULT NULL,
+  PRIMARY KEY (`Dnumber`),
+  UNIQUE KEY `unique_name_dept` (`Dname`),
+  KEY `Mgr_ssn` (`Mgr_ssn`),
+  CONSTRAINT `departament_ibfk_1` FOREIGN KEY (`Mgr_ssn`) REFERENCES `employee` (`Ssn`),
+  CONSTRAINT `chk_date_dept` CHECK ((`Dept_create_date` < `Mgr_start_date`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++-------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.007 sec)
+
+MySQL [azure_company]> desc dept_locations;
+ERROR 1146 (42S02): Table 'azure_company.dept_locations' doesn't exist
+MySQL [azure_company]> CREATE TABLE dept_locations(
+    ->     Dnumber int not null,
+    ->     Dlocation varchar(15) not null,
+    ->     constraint pk_dept_locations primary key (Dnumber, Dlocation),
+    ->     constraint fk_dept_locations foreign key (Dnumber)
+    ->         references departament(Dnumber)
+    ->         on delete cascade
+    ->         on update cascade
+    -> );
+Query OK, 0 rows affected (0.071 sec)
+
+MySQL [azure_company]> CREATE TABLE project(
+    ->     Pname varchar(15) not null,
+    ->     Pnumber int not null,
+    ->     Plocation varchar(15),
+    ->     Dnum int not null,
+    ->     primary key (Pnumber),
+    ->     constraint unique_project unique (Pname),
+    ->     constraint fk_project foreign key (Dnum)
+    ->         references departament(Dnumber)
+    -> );
+Query OK, 0 rows affected (0.079 sec)
+
+MySQL [azure_company]> CREATE TABLE works_on(
+    ->     Essn char(9) not null,
+    ->     Pno int not null,
+    ->     Hours decimal(3,1),
+    ->     primary key (Essn, Pno),
+    ->     constraint fk_works_on_employee foreign key (Essn)
+    ->         references employee(Ssn),
+    ->     constraint fk_works_on_project foreign key (Pno)
+    ->         references project(Pnumber)
+    -> );
+Query OK, 0 rows affected (0.077 sec)
+
+MySQL [azure_company]> CREATE TABLE dependent(
+    ->     Essn char(9) not null,
+    ->     Dependent_name varchar(15) not null,
+    ->     Sex char,
+    ->     Bdate date,
+    ->     Relationship varchar(8),
+    ->     primary key (Essn, Dependent_name),
+    ->     constraint fk_dependent_employee foreign key (Essn)
+    ->         references employee(Ssn)
+    ->         on delete cascade
+    ->         on update cascade
+    -> );
+Query OK, 0 rows affected (0.054 sec)
+
+MySQL [azure_company]> SHOW TABLES;
++-------------------------+
+| Tables_in_azure_company |
++-------------------------+
+| departament             |
+| dependent               |
+| dept_locations          |
+| employee                |
+| project                 |
+| works_on                |
++-------------------------+
+6 rows in set (0.008 sec)
+
+MySQL [azure_company]> ALTER TABLE departament
+    -> DROP FOREIGN KEY departament_ibfk_1,
+    -> ADD CONSTRAINT fk_dept
+    -> FOREIGN KEY (Mgr_ssn) REFERENCES employee(Ssn)
+    -> ON UPDATE CASCADE;
+Query OK, 0 rows affected (0.186 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+MySQL [azure_company]> desc departament;
++------------------+-------------+------+-----+---------+-------+
+| Field            | Type        | Null | Key | Default | Extra |
++------------------+-------------+------+-----+---------+-------+
+| Dname            | varchar(15) | NO   | UNI | NULL    |       |
+| Dnumber          | int         | NO   | PRI | NULL    |       |
+| Mgr_ssn          | char(9)     | NO   | MUL | NULL    |       |
+| Mgr_start_date   | date        | YES  |     | NULL    |       |
+| Dept_create_date | date        | YES  |     | NULL    |       |
++------------------+-------------+------+-----+---------+-------+
+5 rows in set (0.008 sec)
+
+MySQL [azure_company]> SHOW CREATE TABLE departament;
++-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table       | Create Table                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
++-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| departament | CREATE TABLE `departament` (
+  `Dname` varchar(15) NOT NULL,
+  `Dnumber` int NOT NULL,
+  `Mgr_ssn` char(9) NOT NULL,
+  `Mgr_start_date` date DEFAULT NULL,
+  `Dept_create_date` date DEFAULT NULL,
+  PRIMARY KEY (`Dnumber`),
+  UNIQUE KEY `unique_name_dept` (`Dname`),
+  KEY `fk_dept` (`Mgr_ssn`),
+  CONSTRAINT `fk_dept` FOREIGN KEY (`Mgr_ssn`) REFERENCES `employee` (`Ssn`) ON UPDATE CASCADE,
+  CONSTRAINT `chk_date_dept` CHECK ((`Dept_create_date` < `Mgr_start_date`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.007 sec)
+
+MySQL [azure_company]> \q
+Bye
+jessica [ ~ ]$ mysql -h projeto-dio-26.mysql.database.azure.com -u jess26 -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MySQL connection id is 17
+Server version: 8.0.46-azure Source distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MySQL [(none)]> USE azure_company;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+MySQL [azure_company]> SET FOREIGN_KEY_CHECKS = 0;
+Query OK, 0 rows affected (0.006 sec)
+
+MySQL [azure_company]> 
+MySQL [azure_company]> INSERT INTO employee VALUES
+    -> ('John', 'B', 'Smith', '123456789', '1965-01-09', '731-Fondren-Houston-TX', 'M', 30000, '333445555', 5),
+    -> ('Franklin', 'T', 'Wong', '333445555', '1955-12-08', '638-Voss-Houston-TX', 'M', 40000, '888665555', 5),
+    -> ('Alicia', 'J', 'Zelaya', '999887777', '1968-01-19', '3321-Castle-Spring-TX', 'F', 25000, '987654321', 4),
+    -> ('Jennifer', 'S', 'Wallace', '987654321', '1941-06-20', '291-Berry-Bellaire-TX', 'F', 43000, '888665555', 4),
+    -> ('Ramesh', 'K', 'Narayan', '666884444', '1962-09-15', '975-Fire-Oak-Humble-TX', 'M', 38000, '333445555', 5),
+    -> ('Joyce', 'A', 'English', '453453453', '1972-07-31', '5631-Rice-Houston-TX', 'F', 25000, '333445555', 5),
+    -> ('Ahmad', 'V', 'Jabbar', '987987987', '1969-03-29', '980-Dallas-Houston-TX', 'M', 25000, '987654321', 4),
+    -> ('James', 'E', 'Borg', '888665555', '1937-11-10', '450-Stone-Houston-TX', 'M', 55000, NULL, 1);
+Query OK, 8 rows affected (0.020 sec)
+Records: 8  Duplicates: 0  Warnings: 0
+
+MySQL [azure_company]> 
+MySQL [azure_company]> SET FOREIGN_KEY_CHECKS = 1;
+Query OK, 0 rows affected (0.006 sec)
+
+MySQL [azure_company]> SELECT COUNT(*) FROM employee;
++----------+
+| COUNT(*) |
++----------+
+|        8 |
++----------+
+1 row in set (0.006 sec)
+
+MySQL [azure_company]> INSERT INTO dependent VALUES
+    -> ('333445555', 'Alice', 'F', '1986-04-05', 'Daughter'),
+    -> ('333445555', 'Theodore', 'M', '1983-10-25', 'Son'),
+    -> ('333445555', 'Joy', 'F', '1958-05-03', 'Spouse'),
+    -> ('987654321', 'Abner', 'M', '1942-02-28', 'Spouse'),
+    -> ('123456789', 'Michael', 'M', '1988-01-04', 'Son'),
+    -> ('123456789', 'Alice', 'F', '1988-12-30', 'Daughter'),
+    -> ('123456789', 'Elizabeth', 'F', '1967-05-05', 'Spouse');
+Query OK, 7 rows affected (0.018 sec)
+Records: 7  Duplicates: 0  Warnings: 0
+
+MySQL [azure_company]> INSERT INTO departament VALUES
+    -> ('Research', 5, '333445555', '1988-05-22', '1986-05-22'),
+    -> ('Administration', 4, '987654321', '1995-01-01', '1994-01-01'),
+    -> ('Headquarters', 1, '888665555', '1981-06-19', '1980-06-19');
+Query OK, 3 rows affected (0.014 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+MySQL [azure_company]> INSERT INTO dept_locations VALUES
+    -> (1, 'Houston'),
+    -> (4, 'Stafford'),
+    -> (5, 'Bellaire'),
+    -> (5, 'Sugarland'),
+    -> (5, 'Houston');
+Query OK, 5 rows affected (0.014 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+MySQL [azure_company]> INSERT INTO project VALUES
+    -> ('ProductX', 1, 'Bellaire', 5),
+    -> ('ProductY', 2, 'Sugarland', 5),
+    -> ('ProductZ', 3, 'Houston', 5),
+    -> ('Computerization', 10, 'Stafford', 4),
+    -> ('Reorganization', 20, 'Houston', 1),
+    -> ('Newbenefits', 30, 'Stafford', 4);
+Query OK, 6 rows affected (0.015 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+MySQL [azure_company]> INSERT INTO works_on VALUES
+    -> ('123456789', 1, 32.5),
+    -> ('123456789', 2, 7.5),
+    -> ('666884444', 3, 40.0),
+    -> ('453453453', 1, 20.0),
+    -> ('453453453', 2, 20.0),
+    -> ('333445555', 2, 10.0),
+    -> ('333445555', 3, 10.0),
+    -> ('333445555', 10, 10.0),
+    -> ('333445555', 20, 10.0),
+    -> ('999887777', 30, 30.0),
+    -> ('999887777', 10, 10.0),
+    -> ('987987987', 10, 35.0),
+    -> ('987987987', 30, 5.0),
+    -> ('987654321', 30, 20.0),
+    -> ('987654321', 20, 15.0),
+    -> ('888665555', 20, 0.0);
+Query OK, 16 rows affected (0.015 sec)
+Records: 16  Duplicates: 0  Warnings: 0
+
+MySQL [azure_company]> SELECT 'employee' AS tabela, COUNT(*) AS total FROM employee
+    -> UNION ALL
+    -> SELECT 'dependent', COUNT(*) FROM dependent
+    -> UNION ALL
+    -> SELECT 'departament', COUNT(*) FROM departament
+    -> UNION ALL
+    -> SELECT 'dept_locations', COUNT(*) FROM dept_locations
+    -> UNION ALL
+    -> SELECT 'project', COUNT(*) FROM project
+    -> UNION ALL
+    -> SELECT 'works_on', COUNT(*) FROM works_on;
++----------------+-------+
+| tabela         | total |
++----------------+-------+
+| employee       |     8 |
+| dependent      |     7 |
+| departament    |     3 |
+| dept_locations |     5 |
+| project        |     6 |
+| works_on       |    16 |
++----------------+-------+
+6 rows in set (0.025 sec)
+
+MySQL [azure_company]> SELECT * FROM employee;
++----------+-------+---------+-----------+------------+------------------------+------+----------+-----------+-----+
+| Fname    | Minit | Lname   | Ssn       | Bdate      | Address                | Sex  | Salary   | Super_ssn | Dno |
++----------+-------+---------+-----------+------------+------------------------+------+----------+-----------+-----+
+| John     | B     | Smith   | 123456789 | 1965-01-09 | 731-Fondren-Houston-TX | M    | 30000.00 | 333445555 |   5 |
+| Franklin | T     | Wong    | 333445555 | 1955-12-08 | 638-Voss-Houston-TX    | M    | 40000.00 | 888665555 |   5 |
+| Joyce    | A     | English | 453453453 | 1972-07-31 | 5631-Rice-Houston-TX   | F    | 25000.00 | 333445555 |   5 |
+| Ramesh   | K     | Narayan | 666884444 | 1962-09-15 | 975-Fire-Oak-Humble-TX | M    | 38000.00 | 333445555 |   5 |
+| James    | E     | Borg    | 888665555 | 1937-11-10 | 450-Stone-Houston-TX   | M    | 55000.00 | NULL      |   1 |
+| Jennifer | S     | Wallace | 987654321 | 1941-06-20 | 291-Berry-Bellaire-TX  | F    | 43000.00 | 888665555 |   4 |
+| Ahmad    | V     | Jabbar  | 987987987 | 1969-03-29 | 980-Dallas-Houston-TX  | M    | 25000.00 | 987654321 |   4 |
+| Alicia   | J     | Zelaya  | 999887777 | 1968-01-19 | 3321-Castle-Spring-TX  | F    | 25000.00 | 987654321 |   4 |
++----------+-------+---------+-----------+------------+------------------------+------+----------+-----------+-----+
+8 rows in set (0.006 sec)
+
+MySQL [azure_company]> SELECT Ssn, COUNT(Essn)
+    -> FROM employee e, dependent d
+    -> WHERE e.Ssn = d.Essn;
+ERROR 1140 (42000): In aggregated query without GROUP BY, expression #1 of SELECT list contains nonaggregated column 'azure_company.e.Ssn'; this is incompatible with sql_mode=only_full_group_by
+MySQL [azure_company]> SELECT e.Ssn, COUNT(d.Essn) AS total_dependentes
+    -> FROM employee e
+    -> LEFT JOIN dependent d ON e.Ssn = d.Essn
+    -> GROUP BY e.Ssn;
++-----------+-------------------+
+| Ssn       | total_dependentes |
++-----------+-------------------+
+| 123456789 |                 3 |
+| 333445555 |                 3 |
+| 453453453 |                 0 |
+| 666884444 |                 0 |
+| 888665555 |                 0 |
+| 987654321 |                 1 |
+| 987987987 |                 0 |
+| 999887777 |                 0 |
++-----------+-------------------+
+8 rows in set (0.006 sec)
+
+MySQL [azure_company]> SELECT * FROM dependent;
++-----------+----------------+------+------------+--------------+
+| Essn      | Dependent_name | Sex  | Bdate      | Relationship |
++-----------+----------------+------+------------+--------------+
+| 123456789 | Alice          | F    | 1988-12-30 | Daughter     |
+| 123456789 | Elizabeth      | F    | 1967-05-05 | Spouse       |
+| 123456789 | Michael        | M    | 1988-01-04 | Son          |
+| 333445555 | Alice          | F    | 1986-04-05 | Daughter     |
+| 333445555 | Joy            | F    | 1958-05-03 | Spouse       |
+| 333445555 | Theodore       | M    | 1983-10-25 | Son          |
+| 987654321 | Abner          | M    | 1942-02-28 | Spouse       |
++-----------+----------------+------+------------+--------------+
+7 rows in set (0.006 sec)
+
+MySQL [azure_company]> SELECT Bdate, Address
+    -> FROM employee
+    -> WHERE Fname = 'John'
+    ->   AND Minit = 'B'
+    ->   AND Lname = 'Smith';
++------------+------------------------+
+| Bdate      | Address                |
++------------+------------------------+
+| 1965-01-09 | 731-Fondren-Houston-TX |
++------------+------------------------+
+1 row in set (0.006 sec)
+
+MySQL [azure_company]> SELECT *
+    -> FROM departament
+    -> WHERE Dname = 'Research';
++----------+---------+-----------+----------------+------------------+
+| Dname    | Dnumber | Mgr_ssn   | Mgr_start_date | Dept_create_date |
++----------+---------+-----------+----------------+------------------+
+| Research |       5 | 333445555 | 1988-05-22     | 1986-05-22       |
++----------+---------+-----------+----------------+------------------+
+1 row in set (0.006 sec)
+
+MySQL [azure_company]> SELECT Fname, Lname, Address
+    -> FROM employee, departament
+    -> WHERE Dname = 'Research'
+    ->   AND Dnumber = Dno;
++----------+---------+------------------------+
+| Fname    | Lname   | Address                |
++----------+---------+------------------------+
+| John     | Smith   | 731-Fondren-Houston-TX |
+| Franklin | Wong    | 638-Voss-Houston-TX    |
+| Joyce    | English | 5631-Rice-Houston-TX   |
+| Ramesh   | Narayan | 975-Fire-Oak-Humble-TX |
++----------+---------+------------------------+
+4 rows in set (0.006 sec)
+
+MySQL [azure_company]> SELECT * FROM project;
++-----------------+---------+-----------+------+
+| Pname           | Pnumber | Plocation | Dnum |
++-----------------+---------+-----------+------+
+| ProductX        |       1 | Bellaire  |    5 |
+| ProductY        |       2 | Sugarland |    5 |
+| ProductZ        |       3 | Houston   |    5 |
+| Computerization |      10 | Stafford  |    4 |
+| Reorganization  |      20 | Houston   |    1 |
+| Newbenefits     |      30 | Stafford  |    4 |
++-----------------+---------+-----------+------+
+6 rows in set (0.009 sec)
+
+MySQL [azure_company]> SELECT Dname AS Department, Mgr_ssn AS Manager
+    -> FROM departament d, dept_locations l
+    -> WHERE d.Dnumber = l.Dnumber;
++----------------+-----------+
+| Department     | Manager   |
++----------------+-----------+
+| Headquarters   | 888665555 |
+| Administration | 987654321 |
+| Research       | 333445555 |
+| Research       | 333445555 |
+| Research       | 333445555 |
++----------------+-----------+
+5 rows in set (0.007 sec)
+
+MySQL [azure_company]> SELECT Dname AS Department, CONCAT(Fname, ' ', Lname) AS Manager
+    -> FROM departament d, dept_locations l, employee e
+    -> WHERE d.Dnumber = l.Dnumber
+    ->   AND Mgr_ssn = e.Ssn;
++----------------+------------------+
+| Department     | Manager          |
++----------------+------------------+
+| Headquarters   | James Borg       |
+| Administration | Jennifer Wallace |
+| Research       | Franklin Wong    |
+| Research       | Franklin Wong    |
+| Research       | Franklin Wong    |
++----------------+------------------+
+5 rows in set (0.007 sec)
+
+MySQL [azure_company]> SELECT *
+    -> FROM project, departament
+    -> WHERE Dnum = Dnumber
+    ->   AND Plocation = 'Stafford';
++-----------------+---------+-----------+------+----------------+---------+-----------+----------------+------------------+
+| Pname           | Pnumber | Plocation | Dnum | Dname          | Dnumber | Mgr_ssn   | Mgr_start_date | Dept_create_date |
++-----------------+---------+-----------+------+----------------+---------+-----------+----------------+------------------+
+| Computerization |      10 | Stafford  |    4 | Administration |       4 | 987654321 | 1995-01-01     | 1994-01-01       |
+| Newbenefits     |      30 | Stafford  |    4 | Administration |       4 | 987654321 | 1995-01-01     | 1994-01-01       |
++-----------------+---------+-----------+------+----------------+---------+-----------+----------------+------------------+
+2 rows in set (0.007 sec)
+
+MySQL [azure_company]> SELECT Pnumber, Dnum, Lname, Address, Bdate
+    -> FROM project, departament, employee
+    -> WHERE Dnum = Dnumber
+    ->   AND Mgr_ssn = Ssn
+    ->   AND Plocation = 'Stafford';
++---------+------+---------+-----------------------+------------+
+| Pnumber | Dnum | Lname   | Address               | Bdate      |
++---------+------+---------+-----------------------+------------+
+|      10 |    4 | Wallace | 291-Berry-Bellaire-TX | 1941-06-20 |
+|      30 |    4 | Wallace | 291-Berry-Bellaire-TX | 1941-06-20 |
++---------+------+---------+-----------------------+------------+
+2 rows in set (0.007 sec)
+
+MySQL [azure_company]> SELECT *
+    -> FROM employee
+    -> WHERE Dno IN (3, 6, 9);
+Empty set (0.006 sec)
+
+MySQL [azure_company]> SELECT Fname, Lname, Salary, Salary * 0.011
+    -> FROM employee;
++----------+---------+----------+----------------+
+| Fname    | Lname   | Salary   | Salary * 0.011 |
++----------+---------+----------+----------------+
+| John     | Smith   | 30000.00 |      330.00000 |
+| Franklin | Wong    | 40000.00 |      440.00000 |
+| Joyce    | English | 25000.00 |      275.00000 |
+| Ramesh   | Narayan | 38000.00 |      418.00000 |
+| James    | Borg    | 55000.00 |      605.00000 |
+| Jennifer | Wallace | 43000.00 |      473.00000 |
+| Ahmad    | Jabbar  | 25000.00 |      275.00000 |
+| Alicia   | Zelaya  | 25000.00 |      275.00000 |
++----------+---------+----------+----------------+
+8 rows in set (0.006 sec)
+
+MySQL [azure_company]> SELECT Fname, Lname, Salary, Salary * 0.011 AS INSS
+    -> FROM employee;
++----------+---------+----------+-----------+
+| Fname    | Lname   | Salary   | INSS      |
++----------+---------+----------+-----------+
+| John     | Smith   | 30000.00 | 330.00000 |
+| Franklin | Wong    | 40000.00 | 440.00000 |
+| Joyce    | English | 25000.00 | 275.00000 |
+| Ramesh   | Narayan | 38000.00 | 418.00000 |
+| James    | Borg    | 55000.00 | 605.00000 |
+| Jennifer | Wallace | 43000.00 | 473.00000 |
+| Ahmad    | Jabbar  | 25000.00 | 275.00000 |
+| Alicia   | Zelaya  | 25000.00 | 275.00000 |
++----------+---------+----------+-----------+
+8 rows in set (0.006 sec)
+
+MySQL [azure_company]> SELECT Fname, Lname, Salary,
+    ->        ROUND(Salary * 0.011, 2) AS INSS
+    -> FROM employee;
++----------+---------+----------+--------+
+| Fname    | Lname   | Salary   | INSS   |
++----------+---------+----------+--------+
+| John     | Smith   | 30000.00 | 330.00 |
+| Franklin | Wong    | 40000.00 | 440.00 |
+| Joyce    | English | 25000.00 | 275.00 |
+| Ramesh   | Narayan | 38000.00 | 418.00 |
+| James    | Borg    | 55000.00 | 605.00 |
+| Jennifer | Wallace | 43000.00 | 473.00 |
+| Ahmad    | Jabbar  | 25000.00 | 275.00 |
+| Alicia   | Zelaya  | 25000.00 | 275.00 |
++----------+---------+----------+--------+
+8 rows in set (0.006 sec)
+
+MySQL [azure_company]> SELECT e.Fname, e.Lname,
+    ->        1.1 * e.Salary AS increased_sal
+    -> FROM employee AS e,
+    ->      works_on AS w,
+    ->      project AS p
+    -> WHERE e.Ssn = w.Essn
+    ->   AND w.Pno = p.Pnumber
+    ->   AND p.Pname = 'ProductX';
++-------+---------+---------------+
+| Fname | Lname   | increased_sal |
++-------+---------+---------------+
+| John  | Smith   |     33000.000 |
+| Joyce | English |     27500.000 |
++-------+---------+---------------+
+2 rows in set (0.007 sec)
+
+MySQL [azure_company]> SELECT Dname AS Department,
+    ->        CONCAT(Fname, ' ', Lname) AS Manager
+    -> FROM departament d, dept_locations l, employee e
+    -> WHERE d.Dnumber = l.Dnumber
+    ->   AND Mgr_ssn = e.Ssn;
++----------------+------------------+
+| Department     | Manager          |
++----------------+------------------+
+| Headquarters   | James Borg       |
+| Administration | Jennifer Wallace |
+| Research       | Franklin Wong    |
+| Research       | Franklin Wong    |
+| Research       | Franklin Wong    |
++----------------+------------------+
+5 rows in set (0.007 sec)
+
+MySQL [azure_company]> SELECT e.Fname, e.Lname, e.Address
+    -> FROM employee e, departament d
+    -> WHERE d.Dname = 'Research'
+    ->   AND d.Dnumber = e.Dno;
++----------+---------+------------------------+
+| Fname    | Lname   | Address                |
++----------+---------+------------------------+
+| John     | Smith   | 731-Fondren-Houston-TX |
+| Franklin | Wong    | 638-Voss-Houston-TX    |
+| Joyce    | English | 5631-Rice-Houston-TX   |
+| Ramesh   | Narayan | 975-Fire-Oak-Humble-TX |
++----------+---------+------------------------+
+4 rows in set (0.007 sec)
+
+MySQL [azure_company]> SELECT Fname, Lname, Address
+    -> FROM employee, departament
+    -> WHERE Dname = 'Research' AND Dnumber = Dno;
++----------+---------+------------------------+
+| Fname    | Lname   | Address                |
++----------+---------+------------------------+
+| John     | Smith   | 731-Fondren-Houston-TX |
+| Franklin | Wong    | 638-Voss-Houston-TX    |
+| Joyce    | English | 5631-Rice-Houston-TX   |
+| Ramesh   | Narayan | 975-Fire-Oak-Humble-TX |
++----------+---------+------------------------+
+4 rows in set (0.006 sec)
+
+MySQL [azure_company]> SELECT Bdate, Address
+    -> FROM employee
+    -> WHERE Fname = 'John'
+    ->   AND Minit = 'B'
+    ->   AND Lname = 'Smith';
++------------+------------------------+
+| Bdate      | Address                |
++------------+------------------------+
+| 1965-01-09 | 731-Fondren-Houston-TX |
++------------+------------------------+
+1 row in set (0.006 sec)
+
+MySQL [azure_company]> SELECT e.Fname, e.Lname, e.Address
+    -> FROM employee e, departament d
+    -> WHERE d.Dname = 'Research'
+    ->   AND d.Dnumber = e.Dno;
++----------+---------+------------------------+
+| Fname    | Lname   | Address                |
++----------+---------+------------------------+
+| John     | Smith   | 731-Fondren-Houston-TX |
+| Franklin | Wong    | 638-Voss-Houston-TX    |
+| Joyce    | English | 5631-Rice-Houston-TX   |
+| Ramesh   | Narayan | 975-Fire-Oak-Humble-TX |
++----------+---------+------------------------+
+4 rows in set (0.006 sec)
+
+MySQL [azure_company]> 
