@@ -43,6 +43,9 @@ Desenvolvimento de atividades voltadas à modelagem de dados, explorando a estru
 
 **Arquivos disponíveis:**
 - **Imagem (.png):** representação visual do modelo dimensional Star Schema.
+- **Power BI (.pbix):** arquivo do projeto com as tabelas, os relacionamentos, as medidas criadas e a tabela calendário desenvolvida com DAX.
+- **Documento Word (.docx):** descrição das etapas realizadas e capturas de tela do processo no Power Query.
+- **Imagem (.png):** representação visual do modelo dimensional e dos relacionamentos entre as tabelas.
 
 ## 🛠️ Ferramentas e tecnologias
 
